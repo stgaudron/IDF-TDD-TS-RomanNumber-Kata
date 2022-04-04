@@ -1,59 +1,46 @@
 import { expect } from "chai"
 import feature from "./feature"
 
-const applyNumberOfI = (numberOfI: number): string => {
+const applyNumberofx = (numberOfx : number, x : string): string => {
   let romanNumber = ""
-  for (let i = 0; i < numberOfI; i++) {
-    romanNumber += "I"
+  for (let i=0; i < numberOfx; i++) {
+    romanNumber += x
   }
   return romanNumber
 }
 
-const applyNumberofX = (numberOfX : number): string => {
+const strPattern = (value: number, one: string , five: string, ten: string) : string => {
   let romanNumber = ""
-  for (let i=0; i < numberOfX; i++) {
-    romanNumber += "X"
+  let numberOfx = value % 10
+  if (value % 10 == 4) {
+    romanNumber = one + five
+    return romanNumber
   }
-  return romanNumber
-}
-
-const applyFifty = (arabicNumber: number) : string => {
-  const fiftyPrefix = arabicNumber < 40 || arabicNumber > 89 ? "" : arabicNumber % 50 > 39 && arabicNumber < 50 ? "XL" : "L"
-  return fiftyPrefix
-}
-
-const applyNumberOfC = (numberOfC: number) : string => {
-  let romanNumber= ""
-  for (let i=0; i < numberOfC; i++) {
-    romanNumber += "C"
+  if (value % 10 > 4) {
+    numberOfx = value % 10 -5
+    romanNumber = five
   }
-  return romanNumber
-
+  if (value % 10 == 9) {
+    numberOfx = 0
+    romanNumber = one + ten
+  }
+  return romanNumber + applyNumberofx(numberOfx, one)
 }
 
 const romanConverter = (arabicNumber: number): string => {
-  let romanNumber = ""
-  const isInTheNineties = arabicNumber.toString().charAt(arabicNumber.toString().length-2) == '9' ? true : false
-  let numberOfI = arabicNumber % 10 < 4 ? arabicNumber % 10 : arabicNumber % 10 - 5
-  let numberOfX = isInTheNineties ? 0 : arabicNumber / 10 < 4 ? arabicNumber / 10 -1  : arabicNumber / 10 - 6
-  let numberOfC = isInTheNineties ? 0 : arabicNumber / 100 < 4 ? arabicNumber / 100 -1 : arabicNumber / 100 - 6
-  if (arabicNumber % 10 == 4) {
-    romanNumber = "IV"
-  }
-  if (arabicNumber % 10 > 4) {
-    romanNumber = "V"
-  }
-  if (arabicNumber % 10 == 9) {
-    numberOfI = 0
-    romanNumber = "IX"
-  }
-  if (arabicNumber % 10 == 0) {
-    romanNumber = isInTheNineties ? "" : arabicNumber / 10 < 4 || arabicNumber / 10 > 5 ? "X" : ""
-  }
-  if (isInTheNineties) {
-    romanNumber = "XC"
-  }
-  return applyNumberOfC(numberOfC) + applyFifty(arabicNumber) + applyNumberofX(numberOfX)+ romanNumber + applyNumberOfI(numberOfI)
+  
+  const arabicArray = Array.from(arabicNumber.toString()).map(Number)
+  const units = arabicArray[arabicArray.length-1]
+  const tens = arabicArray[arabicArray.length-2] | 0
+  const hundreds = arabicArray[arabicArray.length-3] | 0
+
+  const unitResult = strPattern(units, "I", "V", "X")
+  const tensResult = tens == 0 ? "" : strPattern(tens, "X", "L", "C")
+  const hundredsResult = hundreds == 0 ? "" : strPattern(hundreds, "C", "D", "M")
+
+  return hundredsResult + tensResult + unitResult
+  
+  
 }
 describe(`Unit`, function () {
   describe(`romanConverter`, function () {
@@ -107,6 +94,19 @@ describe(`Unit`, function () {
       { arabicNumber: 95, romanNumber: "XCV" },
       { arabicNumber: 96, romanNumber: "XCVI" },
       { arabicNumber: 99, romanNumber: "XCIX" },
+      { arabicNumber: 100, romanNumber: "C" },
+      { arabicNumber: 101, romanNumber: "CI" },
+      { arabicNumber: 112, romanNumber: "CXII" },
+      { arabicNumber: 124, romanNumber: "CXXIV" },
+      { arabicNumber: 149, romanNumber: "CXLIX" },
+      { arabicNumber: 156, romanNumber: "CLVI" },
+      { arabicNumber: 189, romanNumber: "CLXXXIX" },
+      { arabicNumber: 196, romanNumber: "CXCVI" },
+      { arabicNumber: 199, romanNumber: "CXCIX" },
+      { arabicNumber: 245, romanNumber: "CCXLV" },
+      { arabicNumber: 489, romanNumber: "CDLXXXIX" },
+      { arabicNumber: 875, romanNumber: "DCCCLXXV" },
+      { arabicNumber: 994, romanNumber: "CMXCIV" },
     ].forEach(({ arabicNumber, romanNumber }) => {
       describe(`When paramater is ${arabicNumber}`, function () {
         it(`Should return ${romanNumber} `, function () {
